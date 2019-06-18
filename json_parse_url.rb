@@ -1,7 +1,6 @@
 require 'json'
 require 'open-uri'
-require "date"
-require "rest-client"
+
 
 
 url = 'https://api.github.com/users/shliamin'
