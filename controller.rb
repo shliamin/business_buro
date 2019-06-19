@@ -11,7 +11,8 @@ class Controller
   # USER ACTIONS
 
   def list_agr
-    display_results
+    results = ScrapeYandexSearch.new.call
+    @view.display(results)
   end
 
   def list_sqi

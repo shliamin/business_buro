@@ -1,25 +1,21 @@
-require "open-uri"
-require "nokogiri"
-require_relative "result"
+require_relative 'result'
+require 'byebug'
+require 'httparty'
+require 'nokogiri'
 
 class ScrapeYandexSearch
-  def initialize(ingredient)
-    @ingredient = ingredient
-  end
 
   def call
-    html = open("http://www.letscookfrench.com/recipes/find-recipe.aspx?aqt=#{@ingredient}").read
-    # 1. Parse HTML
-    doc = Nokogiri::HTML(html, nil, "utf-8")
-    # 2. For the first five results
+    url = "https://yandex.ru/search/?lr=177&text=ruby"
+    unparsed_page = HTTParty.get(url)
+    parsed_page = Nokogiri::HTML(unparsed_page)
+    yandex_results = parsed_page.css('div.organic typo typo_text_m typo_line_s')
     all_results = []
-    doc.search(".recette_classique").first(5).each do |element|
-      # 3. Create recipe and store it in results
-      url = element.search('.m_titre_resultat a').text.strip
-      agr = element.search('.m_texte_resultat').text.strip
-      sqi = element.search('.m_prep_time').first.parent.text.strip
-      all_results << Result.new(url: url, agr: agr, sqi: sqi)
+    yandex_results.first(10).each do |yandex_result|
+      url = yandex_result.css('a')[0].attributes["href"].value
+      all_results << Result.new(url: url)
+    byebug
     end
-    return all_results
+    puts all_results
   end
 end
